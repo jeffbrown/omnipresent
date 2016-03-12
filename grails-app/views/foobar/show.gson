@@ -1,0 +1,7 @@
+import demo.Foobar
+
+model {
+	Foobar foobar
+}
+
+json tmpl.foobar(foobar)

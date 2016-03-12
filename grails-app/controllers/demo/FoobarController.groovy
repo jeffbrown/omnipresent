@@ -6,6 +6,7 @@ import grails.transaction.Transactional
 @Transactional(readOnly = true)
 class FoobarController {
 
+    static responseFormats = ['json', 'xml']
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
     def index(Integer max) {
@@ -17,15 +18,11 @@ class FoobarController {
         respond foobar
     }
 
-    def create() {
-        respond new Foobar(params)
-    }
-
     @Transactional
     def save(Foobar foobar) {
         if (foobar == null) {
             transactionStatus.setRollbackOnly()
-            notFound()
+            render status: NOT_FOUND
             return
         }
 
@@ -37,24 +34,14 @@ class FoobarController {
 
         foobar.save flush:true
 
-        request.withFormat {
-            form multipartForm {
-                flash.message = message(code: 'default.created.message', args: [message(code: 'foobar.label', default: 'Foobar'), foobar.id])
-                redirect foobar
-            }
-            '*' { respond foobar, [status: CREATED] }
-        }
-    }
-
-    def edit(Foobar foobar) {
-        respond foobar
+        respond foobar, [status: CREATED, view:"show"]
     }
 
     @Transactional
     def update(Foobar foobar) {
         if (foobar == null) {
             transactionStatus.setRollbackOnly()
-            notFound()
+            render status: NOT_FOUND
             return
         }
 
@@ -66,13 +53,7 @@ class FoobarController {
 
         foobar.save flush:true
 
-        request.withFormat {
-            form multipartForm {
-                flash.message = message(code: 'default.updated.message', args: [message(code: 'foobar.label', default: 'Foobar'), foobar.id])
-                redirect foobar
-            }
-            '*'{ respond foobar, [status: OK] }
-        }
+        respond foobar, [status: OK, view:"show"]
     }
 
     @Transactional
@@ -80,28 +61,12 @@ class FoobarController {
 
         if (foobar == null) {
             transactionStatus.setRollbackOnly()
-            notFound()
+            render status: NOT_FOUND
             return
         }
 
         foobar.delete flush:true
 
-        request.withFormat {
-            form multipartForm {
-                flash.message = message(code: 'default.deleted.message', args: [message(code: 'foobar.label', default: 'Foobar'), foobar.id])
-                redirect action:"index", method:"GET"
-            }
-            '*'{ render status: NO_CONTENT }
-        }
-    }
-
-    protected void notFound() {
-        request.withFormat {
-            form multipartForm {
-                flash.message = message(code: 'default.not.found.message', args: [message(code: 'foobar.label', default: 'Foobar'), params.id])
-                redirect action: "index", method: "GET"
-            }
-            '*'{ render status: NOT_FOUND }
-        }
+        render status: NO_CONTENT
     }
 }

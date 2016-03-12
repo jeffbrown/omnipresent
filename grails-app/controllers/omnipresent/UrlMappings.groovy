@@ -1,3 +1,5 @@
+package omnipresent
+
 class UrlMappings {
 
     static mappings = {
@@ -9,8 +11,8 @@ class UrlMappings {
 
         "/api/foobar"(resources: 'foobar')
 
-        "/"(view:"/index")
-        "500"(view:'/error')
-        "404"(view:'/notFound')
+        "/"(controller: 'application', action:'index')
+        "500"(view: '/error')
+        "404"(view: '/notFound')
     }
 }
